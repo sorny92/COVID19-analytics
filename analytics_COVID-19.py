@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
+from datetime import datetime
 
 
 confirmed = pd.read_csv("COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv")
@@ -20,7 +21,13 @@ data = confirmed[interesting_rows].iloc[:, 4:]
 dates = data.columns.values
 print(data.values[0])
 
+fig= plt.figure(figsize=(20,10))
 plot = plt.plot(dates, data.values[0])
 plt.yscale("log")
-plt.grid()
+plt.xticks(rotation=45)
+plt.grid(which='both')
+
+now = datetime.now()
+dt_string = now.strftime("%d%m%Y-%H%M%S")
+plt.savefig(dt_string +".png")
 plt.waitforbuttonpress()
