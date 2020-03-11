@@ -13,9 +13,8 @@ recovered = pd.read_csv("COVID-19/csse_covid_19_data/csse_covid_19_time_series/t
 # print(pd.unique(confirmed["Country/Region"]))
 
 interesting_countries = ["Mainland China", "US", "Italy", "UK", "Spain", "Netherlands"]
-interesting_countries = ["US", "Italy", "UK", "Spain", "Netherlands"]
-interesting_countries = ["Italy", "UK", "Spain", "Netherlands"]
-interesting_countries2 = ["Spain"]
+# interesting_countries = ["US", "Italy", "UK", "Spain", "Netherlands"]
+# interesting_countries = ["Italy", "UK", "Spain", "Netherlands"]
 
 
 def plot_basic_logaritmic_data(data: pd.DataFrame, interesting_data: list):
@@ -93,14 +92,52 @@ def fit_a_curver(data: pd.DataFrame, interesting_data: list):
     plt.grid(which='both')
 
 
-from_day_zero(confirmed, interesting_countries)
-plot_basic_logaritmic_data(confirmed, interesting_countries)
-from_day_zero(deaths, interesting_countries)
-plot_basic_logaritmic_data(deaths, interesting_countries)
-from_day_zero(recovered, interesting_countries)
-plot_basic_logaritmic_data(recovered, interesting_countries)
+def other_fitter(data: pd.DataFrame, interesting_data: list):
+    interesting_rows = confirmed["Country/Region"].isin(interesting_data)
+    data = data[interesting_rows].iloc[:, :]
+    from lmfit.models import LorentzianModel
 
-fit_a_curver(confirmed, ["Mainland China"])
+    fig = plt.figure(figsize=(10, 5))
+    for c in range(len(data.index)):
+        n = data.values[c, 4:].shape[0]
+        x = ar(range(data.values[c, 4:].shape[0]))
+        y = data.iloc[c, 4:].diff().fillna(0)
+
+        print(y)
+        print(x)
+        model = LorentzianModel()
+        params = model.guess(y.values, x=x)
+
+        result = model.fit(y, params, x=x)
+        label = "{}-{}".format(data.values[c, 0], data.values[c, 1])
+        plt.plot(x, y, label=label)
+        x_pred = ar(range(100))
+        plt.plot(x_pred, model.eval(result.params, x=x_pred), 'ro:', label='fit')
+        # print(result.fit_report())
+        # result.plot_fit()
+    plt.legend(prop={"size": 4})
+    plt.yscale('log')
+    plt.xticks(rotation=45)
+    plt.grid(which='both')
+    now = datetime.now()
+    dt_string = now.strftime("%d%m%Y-%H%M%S")
+    plt.savefig(dt_string + ".png")
+
+from_day_zero(confirmed, interesting_countries)
+plt.pause(1)
+plot_basic_logaritmic_data(confirmed, interesting_countries)
+plt.pause(1)
+from_day_zero(deaths, interesting_countries)
+plt.pause(1)
+plot_basic_logaritmic_data(deaths, interesting_countries)
+plt.pause(1)
+from_day_zero(recovered, interesting_countries)
+plt.pause(1)
+plot_basic_logaritmic_data(recovered, interesting_countries)
+plt.pause(1)
+#
+# fit_a_curver(confirmed, ["Mainland China"])
 # fit_a_curver(confirmed, ["Spain"])
-fit_a_curver(confirmed, ["Italy", "UK", "Spain", "Netherlands"])
+# fit_a_curver(confirmed, ["Italy", "UK", "Spain", "Netherlands"])
+# other_fitter(confirmed, interesting_countries)
 plt.show()
