@@ -9,12 +9,13 @@ confirmed = pd.read_csv("COVID-19/csse_covid_19_data/csse_covid_19_time_series/t
 deaths = pd.read_csv("COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv")
 recovered = pd.read_csv("COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv")
 
-# print("List of available countries")
-# print(pd.unique(confirmed["Country/Region"]))
+print("List of available countries")
+print(pd.unique(confirmed["Country/Region"]))
 
-interesting_countries = ["Mainland China", "US", "Italy", "UK", "Spain", "Netherlands"]
-# interesting_countries = ["US", "Italy", "UK", "Spain", "Netherlands"]
-# interesting_countries = ["Italy", "UK", "Spain", "Netherlands"]
+# interesting_countries = ["China", "US", "Italy", "United Kingdom", "Spain", "Netherlands"]
+interesting_countries = ["US", "Italy", "United Kingdom", "Spain", "Netherlands"]
+interesting_countries = ["China", "Italy", "United Kingdom", "Spain", "Netherlands"]
+interesting_countries = ["Italy", "United Kingdom", "Spain", "Netherlands", "Iran", "South Korea"]
 
 
 def plot_basic_logaritmic_data(data: pd.DataFrame, interesting_data: list):
@@ -41,13 +42,14 @@ def plot_basic_logaritmic_data(data: pd.DataFrame, interesting_data: list):
 
 
 def from_day_zero(data: pd.DataFrame, interesting_data: list):
+    day_zero_n_patients = 10
     interesting_rows = confirmed["Country/Region"].isin(interesting_data)
     data = data[interesting_rows].iloc[:, :]
 
     fig = plt.figure(figsize=(10, 5))
     for c in range(len(data.index)):
         label = "{}-{}".format(data.values[c, 0], data.values[c, 1])
-        values = data.values[c, 4:][data.iloc[c, 4:] > 3]
+        values = data.values[c, 4:][data.iloc[c, 4:] > day_zero_n_patients]
 
         # break
         plot = plt.plot(values, label=label)
