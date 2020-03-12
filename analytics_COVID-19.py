@@ -15,7 +15,8 @@ print(pd.unique(confirmed["Country/Region"]))
 # interesting_countries = ["China", "US", "Italy", "United Kingdom", "Spain", "Netherlands"]
 interesting_countries = ["US", "Italy", "United Kingdom", "Spain", "Netherlands"]
 interesting_countries = ["China", "Italy", "United Kingdom", "Spain", "Netherlands"]
-interesting_countries = ["Italy", "United Kingdom", "Spain", "Netherlands", "Iran", "South Korea"]
+interesting_countries = ["US", "China", "Italy", "United Kingdom", "Spain", "Netherlands", "Iran", "South Korea"]
+# interesting_countries = ["US", "China"]
 
 
 def plot_basic_logaritmic_data(data: pd.DataFrame, interesting_data: list):
@@ -26,11 +27,13 @@ def plot_basic_logaritmic_data(data: pd.DataFrame, interesting_data: list):
 
     fig = plt.figure(figsize=(10, 5))
     for c in range(len(data.index)):
-        if data.values[c, 1] is "US":
-            plot = plt.plot(dates, data.values[c, 4:],
-                            label="{}-{}".format(data.values[c, 0], data.values[c, 1], linestyle='dashed'))
+        label = "{}-{}".format(data.values[c, 0], data.values[c, 1])
+        if data.values[c, 1] == "US":
+            plt.plot(dates, data.values[c, 4:], label=label, linestyle='dashed')
+        elif data.values[c, 1] == "China":
+            plt.plot(dates, data.values[c, 4:], label=label, marker="o")
         else:
-            plot = plt.plot(dates, data.values[c, 4:], label="{}-{}".format(data.values[c, 0], data.values[c, 1]))
+            plt.plot(dates, data.values[c, 4:], label=label)
     plt.legend(prop={"size": 4})
     plt.yscale('log')
     plt.xticks(rotation=45)
@@ -51,8 +54,12 @@ def from_day_zero(data: pd.DataFrame, interesting_data: list):
         label = "{}-{}".format(data.values[c, 0], data.values[c, 1])
         values = data.values[c, 4:][data.iloc[c, 4:] > day_zero_n_patients]
 
-        # break
-        plot = plt.plot(values, label=label)
+        if data.values[c, 1] == "US":
+            plt.plot(values, label=label, linestyle='dashed')
+        elif data.values[c, 1] == "China":
+            plt.plot(values, label=label, marker="o")
+        else:
+            plt.plot(values, label=label)
     plt.legend(prop={"size": 4})
     plt.yscale('log')
     plt.xticks(rotation=45)
@@ -125,17 +132,18 @@ def other_fitter(data: pd.DataFrame, interesting_data: list):
     dt_string = now.strftime("%d%m%Y-%H%M%S")
     plt.savefig(dt_string + ".png")
 
+
 from_day_zero(confirmed, interesting_countries)
 plt.pause(1)
-plot_basic_logaritmic_data(confirmed, interesting_countries)
+# plot_basic_logaritmic_data(confirmed, interesting_countries)
 plt.pause(1)
 from_day_zero(deaths, interesting_countries)
 plt.pause(1)
-plot_basic_logaritmic_data(deaths, interesting_countries)
+# plot_basic_logaritmic_data(deaths, interesting_countries)
 plt.pause(1)
 from_day_zero(recovered, interesting_countries)
 plt.pause(1)
-plot_basic_logaritmic_data(recovered, interesting_countries)
+# plot_basic_logaritmic_data(recovered, interesting_countries)
 plt.pause(1)
 #
 # fit_a_curver(confirmed, ["Mainland China"])
