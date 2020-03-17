@@ -1,8 +1,8 @@
 from datetime import datetime
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
-from scipy import asarray as ar, exp
 from scipy.optimize import curve_fit
 
 confirmed = pd.read_csv("COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv")
@@ -15,8 +15,10 @@ print(pd.unique(confirmed["Country/Region"]))
 # interesting_countries = ["China", "US", "Italy", "United Kingdom", "Spain", "Netherlands"]
 interesting_countries = ["US", "Italy", "United Kingdom", "Spain", "Netherlands"]
 interesting_countries = ["China", "Italy", "United Kingdom", "Spain", "Netherlands"]
-interesting_countries = ["US", "China", "Italy", "United Kingdom", "Spain", "Netherlands", "Iran", "South Korea"]
+# interesting_countries = ["US", "China", "United Kingdom", "Italy", "United Kingdom", "Spain", "Netherlands", "Iran", "South Korea"]
 # interesting_countries = ["US", "China"]
+# interesting_countries= ["Italy", "United Kingdom", "Spain", "Netherlands", "Germany", "France", "Poland","Iran", "South Korea"]
+# interesting_countries = ["China", "Spain", "Italy"]
 
 
 def plot_basic_logaritmic_data(data: pd.DataFrame, interesting_data: list):
@@ -25,7 +27,7 @@ def plot_basic_logaritmic_data(data: pd.DataFrame, interesting_data: list):
     dates = data.columns.values[4:]
     print(data.values[0])
 
-    fig = plt.figure(figsize=(10, 5))
+    fig = plt.figure(figsize=(20, 10))
     for c in range(len(data.index)):
         label = "{}-{}".format(data.values[c, 0], data.values[c, 1])
         if data.values[c, 1] == "US":
@@ -34,7 +36,7 @@ def plot_basic_logaritmic_data(data: pd.DataFrame, interesting_data: list):
             plt.plot(dates, data.values[c, 4:], label=label, marker="o")
         else:
             plt.plot(dates, data.values[c, 4:], label=label)
-    plt.legend(prop={"size": 4})
+    plt.legend(prop={"size": 6})
     plt.yscale('log')
     plt.xticks(rotation=45)
     plt.grid(which='both')
@@ -104,27 +106,41 @@ def fit_a_curver(data: pd.DataFrame, interesting_data: list):
 def other_fitter(data: pd.DataFrame, interesting_data: list):
     interesting_rows = confirmed["Country/Region"].isin(interesting_data)
     data = data[interesting_rows].iloc[:, :]
-    from lmfit.models import LorentzianModel
+    from lmfit.models import StepModel, ExponentialModel
 
     fig = plt.figure(figsize=(10, 5))
     for c in range(len(data.index)):
-        n = data.values[c, 4:].shape[0]
-        x = ar(range(data.values[c, 4:].shape[0]))
-        y = data.iloc[c, 4:].diff().fillna(0)
+        day_zero_n_patients = 11
+        days_in_future = 40
+        values = data.values[c, 4:][data.iloc[c, 4:] >= day_zero_n_patients]
+        # values = data.iloc[c, 4:].diff().fillna(0)
+        n = values.shape[0]
+        x = np.asarray(range(values.shape[0]), dtype='float64')
+        y = np.asarray(values, dtype='float64')
 
         print(y)
         print(x)
-        model = LorentzianModel()
-        params = model.guess(y.values, x=x)
+        if len(x) == 0:
+            continue
 
-        result = model.fit(y, params, x=x)
         label = "{}-{}".format(data.values[c, 0], data.values[c, 1])
         plt.plot(x, y, label=label)
-        x_pred = ar(range(100))
-        plt.plot(x_pred, model.eval(result.params, x=x_pred), 'ro:', label='fit')
+        if data.values[c, 1] == "China":
+            continue
+        model_step = StepModel()
+        model_exp = ExponentialModel()
+        params_step = model_step.guess(y, x=x)
+        params_exp = model_exp.guess(y, x=x)
+
+        result_step = model_step.fit(y, params_step, x=x)
+        result_exp = model_exp.fit(y, params_exp, x=x)
+
+        x_pred = np.asarray(range(days_in_future))
+        plt.plot(x_pred, model_step.eval(result_step.params, x=x_pred), ':', label='fit-{}'.format(label))
+        plt.plot(x_pred, model_exp.eval(result_exp.params, x=x_pred), '.', label='fit-{}'.format(label))
         # print(result.fit_report())
         # result.plot_fit()
-    plt.legend(prop={"size": 4})
+    plt.legend(prop={"size": 7})
     plt.yscale('log')
     plt.xticks(rotation=45)
     plt.grid(which='both')
@@ -133,21 +149,21 @@ def other_fitter(data: pd.DataFrame, interesting_data: list):
     plt.savefig(dt_string + ".png")
 
 
-from_day_zero(confirmed, interesting_countries)
-plt.pause(1)
+# from_day_zero(confirmed, interesting_countries)
+# plt.pause(1)
 # plot_basic_logaritmic_data(confirmed, interesting_countries)
-plt.pause(1)
-from_day_zero(deaths, interesting_countries)
-plt.pause(1)
+# plt.pause(1)
+# from_day_zero(deaths, interesting_countries)
+# plt.pause(1)
 # plot_basic_logaritmic_data(deaths, interesting_countries)
-plt.pause(1)
-from_day_zero(recovered, interesting_countries)
-plt.pause(1)
+# plt.pause(1)
+# from_day_zero(recovered, interesting_countries)
+# plt.pause(1)
 # plot_basic_logaritmic_data(recovered, interesting_countries)
-plt.pause(1)
+# plt.pause(1)
 #
 # fit_a_curver(confirmed, ["Mainland China"])
 # fit_a_curver(confirmed, ["Spain"])
 # fit_a_curver(confirmed, ["Italy", "UK", "Spain", "Netherlands"])
-# other_fitter(confirmed, interesting_countries)
+other_fitter(confirmed, interesting_countries)
 plt.show()
