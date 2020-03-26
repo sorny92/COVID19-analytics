@@ -17,7 +17,7 @@ interesting_countries = ["US", "Italy", "United Kingdom", "Spain", "Netherlands"
 interesting_countries = ["China", "Italy", "United Kingdom", "Spain", "Netherlands"]
 # interesting_countries = ["US", "United Kingdom", "Italy", "United Kingdom", "Spain", "Netherlands", "Germany"]
 # interesting_countries = ["US", "China"]
-interesting_countries = ["Italy", "United Kingdom", "Spain", "Netherlands", "Germany", "France", "Poland", "Portugal"]
+interesting_countries = ["Italy", "United Kingdom", "Spain", "Netherlands", "Germany", "France", "Portugal"]
 
 
 # interesting_countries = ["China", "Spain", "Italy"]
