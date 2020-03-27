@@ -1,7 +1,8 @@
 from datetime import datetime
 
-import matplotlib.pyplot as plt
 import matplotlib as mpl
+import matplotlib.pyplot as plt
+
 mpl.style.use('seaborn')
 import numpy as np
 import pandas as pd
@@ -32,12 +33,11 @@ def group_by(datatype: pd.DataFrame, column: str):
 # print("List of available countries")
 # print(pd.unique(data['confirmed']["Country/Region"]))
 
-# interesting_countries = ["China", "US", "Italy", "United Kingdom", "Spain", "Netherlands"]
-interesting_countries = ["US", "Italy", "United Kingdom", "Spain", "Netherlands"]
-# interesting_countries = ["China", "Italy", "United Kingdom", "Spain", "Netherlands"]
-# interesting_countries = ["US", "United Kingdom", "Italy", "United Kingdom", "Spain", "Netherlands", "Germany"]
-# interesting_countries = ["US", "China"]
-interesting_countries = ["US", "China", "Italy", "United Kingdom", "Spain", "Netherlands", "Germany", "France", "Portugal"]
+interesting_countries = ["US", "China", "Italy", "United Kingdom", "Spain", "Netherlands", "Germany", "France",
+                         "Portugal"]
+
+population = {"US": 100, "China": 100, "Italy": 100, "United Kingdom": 100, "Spain": 100, "Netherlands": 100,
+              "Germany": 100, "France": 100, "Portugal": 100}
 
 
 def plot_basic_logaritmic_data(data: pd.DataFrame, interesting_rows, aggregated: bool = False):
@@ -68,7 +68,7 @@ def plot_basic_logaritmic_data(data: pd.DataFrame, interesting_rows, aggregated:
     # plt.savefig(dt_string + ".png")
 
 
-def from_day_zero(data: pd.DataFrame, interesting_rows, aggregated: bool = False):
+def from_day_zero(data: pd.DataFrame, interesting_rows, y_label: str, aggregated: bool = False):
     day_zero_n_patients = 12
     data = data[interesting_rows].iloc[:, :]
 
@@ -84,7 +84,7 @@ def from_day_zero(data: pd.DataFrame, interesting_rows, aggregated: bool = False
             values = interpolate_zero_values(values)
             values = np.concatenate(([0], values))
 
-        if data.values[c, 0] in ["US","China"]:
+        if data.values[c, 0] in ["US", "China"]:
             plt.plot(values, label=label, linestyle='dashed', color=color)
         else:
             plt.plot(values, label=label, marker='o', color=color)
@@ -92,11 +92,14 @@ def from_day_zero(data: pd.DataFrame, interesting_rows, aggregated: bool = False
     plt.yscale('log')
     plt.xticks(rotation=45)
     plt.grid(which='both')
+    plt.ylabel(y_label)
+    plt.xlabel("Days since case nº{}".format(day_zero_n_patients))
     plt.tight_layout()
 
     now = datetime.now()
     dt_string = now.strftime("%d%m%Y-%H%M%S")
     # plt.savefig(dt_string + ".png")
+
 
 data_ = preprocess(data_)
 
@@ -106,11 +109,15 @@ interesting_rows = confirmed["Country/Region"].isin(interesting_countries)
 deaths = group_by(data_['deaths'], 'Country/Region')
 
 # print(confirmed)
-from_day_zero(confirmed, interesting_rows)
-from_day_zero(confirmed, interesting_rows, aggregated=True)
+from_day_zero(confirmed, interesting_rows, "New infections")
+from_day_zero(confirmed, interesting_rows, "Total infections", aggregated=True)
 # plot_basic_logaritmic_data(confirmed, interesting_rows)
-from_day_zero(deaths, interesting_rows)
-from_day_zero(deaths, interesting_rows, aggregated=True)
+from_day_zero(deaths, interesting_rows, "New deaths")
+from_day_zero(deaths, interesting_rows, "Total deaths", aggregated=True)
+
+# CASES/POPULATION
+# ACTIVE CASES (INFECTIONS - DEATHS - RECOVERED)
+# RATIO MUERTES A PARTIR DE RANGO DE EDAD +50/+60/+75/+80
 #
 # from_day_zero(recovered, interesting_rows)
 # from_day_zero(recovered, interesting_rows, aggregated=True)
