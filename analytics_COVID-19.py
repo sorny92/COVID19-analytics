@@ -2,6 +2,7 @@ from datetime import datetime
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+from scipy.ndimage.filters import gaussian_filter1d
 
 mpl.style.use('seaborn')
 import numpy as np
@@ -69,14 +70,13 @@ def plot_basic_logaritmic_data(data: pd.DataFrame, interesting_rows, aggregated:
 
 
 def from_day_zero(data: pd.DataFrame, interesting_rows, y_label: str, aggregated: bool = False):
-    day_zero_n_patients = 12
+    day_zero_n_patients = 20
     data = data[interesting_rows].iloc[:, :]
 
     fig = plt.figure(figsize=(10, 5))
     for c in range(len(data.index)):
         label = data.values[c, 0]
         color = '#{}'.format(hashlib.md5(label.encode()).hexdigest()[:6])
-        print(color)
         if aggregated:
             values = data.values[c, 4:][data.iloc[c, 4:] > day_zero_n_patients]
         else:
@@ -84,10 +84,11 @@ def from_day_zero(data: pd.DataFrame, interesting_rows, y_label: str, aggregated
             values = interpolate_zero_values(values)
             values = np.concatenate(([0], values))
 
+        values_smooth = gaussian_filter1d(list(values), sigma=1)
         if data.values[c, 0] in ["US", "China"]:
-            plt.plot(values, label=label, linestyle='dashed', color=color)
+            plt.plot(values_smooth, label=label, linestyle='dashed', color=color)
         else:
-            plt.plot(values, label=label, marker='o', color=color)
+            plt.plot(values_smooth, label=label, color=color)
     plt.legend(prop={"size": 10})
     plt.yscale('log')
     plt.xticks(rotation=45)
