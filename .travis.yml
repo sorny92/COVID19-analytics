@@ -1,0 +1,18 @@
+language: python
+python:
+  - "3.6"      # current default Python on Travis CI
+jobs:
+  include:
+    - stage: build
+      install:
+        - pip install -r requirements.txt
+      script:
+        - mkdir out
+        - python3 analytics_COVID-19.py
+    - stage: deploy
+      provider: pages
+      skip_cleanup: true
+      github_token:
+      keep_history: true
+      on:
+        branch: master

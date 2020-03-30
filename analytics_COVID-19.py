@@ -35,10 +35,11 @@ def group_by(datatype: pd.DataFrame, column: str):
 # print(pd.unique(data['confirmed']["Country/Region"]))
 
 interesting_countries = ["US", "China", "Italy", "United Kingdom", "Spain", "Netherlands", "Germany", "France",
-                         "Portugal"]
+                         "Portugal", "Austria", "Brazil"]
 
 population = {"US": 327200000, "China": 1386000000, "Italy": 60255000, "United Kingdom": 67036000, "Spain": 47195000,
-              "Netherlands": 17409000, "Germany": 83241000, "France": 64869000, "Portugal": 10240000}
+              "Netherlands": 17409000, "Germany": 83241000, "France": 64869000, "Portugal": 10240000, "Austria": 8822000,
+              "Brazil":209000000, "Russia": 144500000}
 
 
 def plot_basic_logaritmic_data(data: pd.DataFrame, interesting_rows, aggregated: bool = False):
@@ -99,7 +100,7 @@ def from_day_zero(data: pd.DataFrame, interesting_rows, y_label: str, day_zero_n
 
     now = datetime.now()
     dt_string = now.strftime("%d%m%Y-%H%M%S")
-    # plt.savefig(dt_string + ".png")
+    plt.savefig("out/"+ y_label + ".svg")
 
 
 def from_day_zero_over_population(data: pd.DataFrame, interesting_rows, population_dict: dict, y_label: str,
@@ -132,7 +133,7 @@ def from_day_zero_over_population(data: pd.DataFrame, interesting_rows, populati
 
     now = datetime.now()
     dt_string = now.strftime("%d%m%Y-%H%M%S")
-    # plt.savefig(dt_string + ".png")
+    plt.savefig("out/"+ y_label + ".svg")
 
 
 data_ = preprocess(data_)
