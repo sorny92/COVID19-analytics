@@ -35,11 +35,11 @@ def group_by(datatype: pd.DataFrame, column: str):
 # print(pd.unique(data['confirmed']["Country/Region"]))
 
 interesting_countries = ["US", "China", "Italy", "United Kingdom", "Spain", "Netherlands", "Germany", "France",
-                         "Portugal", "Austria", "Brazil"]
+                         "Portugal", "Austria", "Brazil", "Turkey", "Russia"]
 
 population = {"US": 327200000, "China": 1386000000, "Italy": 60255000, "United Kingdom": 67036000, "Spain": 47195000,
               "Netherlands": 17409000, "Germany": 83241000, "France": 64869000, "Portugal": 10240000, "Austria": 8822000,
-              "Brazil":209000000, "Russia": 144500000}
+              "Brazil":209000000, "Russia": 144500000, "Turkey":80810000}
 
 
 def plot_basic_logaritmic_data(data: pd.DataFrame, interesting_rows, aggregated: bool = False):
